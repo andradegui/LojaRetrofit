@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import com.guilherme.retrofit.R
 import com.guilherme.retrofit.databinding.ActivityMainBinding
+import com.guilherme.retrofit.databinding.ItemProdutoBinding
 import com.guilherme.retrofit.model.Produto
 import com.guilherme.retrofit.service.ProdutoService
+import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,9 +49,11 @@ class MainActivity : AppCompatActivity() {
 
                     val listaProduto = response.body()
 
-                    val nomeProduto = listaProduto?.first()?.nomeProduto
+//                    val nomeProduto = listaProduto?.first()?.nomeProduto
 
-                    alert("Sucesso", "Nome do Primeiro Produto: $nomeProduto")
+//                    alert("Sucesso", "Nome do Primeiro Produto: $nomeProduto")
+
+                    mostrarProdutos(listaProduto)
 
                 }
                 else {
@@ -66,6 +70,33 @@ class MainActivity : AppCompatActivity() {
         //5 -> Executar a chamada
 
         chamada.enqueue(callback)
+
+    }
+
+    //Função dos elementos dinâmicos
+    fun mostrarProdutos(listaProdutos: List<Produto>?){
+
+        //0 - Iterar pelos produtos
+        listaProdutos?.forEach {
+
+            //1 - inflar o layout do item da lista
+            val itemProduto = ItemProdutoBinding .inflate(layoutInflater)
+
+            //2 -  Configurar as views com os dados do backend
+            itemProduto.txtNome.text = it.nomeProduto
+            itemProduto.txtPreco.text = it.precProduto.toString()
+
+            //2.2 - Obter img do item
+            Picasso
+                .get()
+                .load("https://oficinacordova.azurewebsites.net/android/rest/produto/image/${it.idProduto}")
+                .into(itemProduto.imageView)
+
+            //3 - Adicionar o layout no container
+            binding.container.addView(itemProduto.root)
+
+        }
+
 
     }
 
